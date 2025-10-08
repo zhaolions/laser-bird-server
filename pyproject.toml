@@ -1,0 +1,131 @@
+[project]
+name = "laser-bird-server"
+version = "0.1.0"
+description = "激光驱鸟器服务端"
+authors = [
+    { name = "zhaolions", email = "zhaolions@qq.com" }
+]
+readme = "README.md"
+requires-python = ">=3.10,<3.11"
+dependencies = [
+    # Web 框架
+    "fastapi>=0.118.1",
+    "uvicorn[standard]>=0.37.0",
+    # 数据验证
+    "pydantic>=2.12.0",
+    # 串口通信
+    "pyserial>=3.5",
+    # 图像处理
+    "opencv-python>=4.12.0.88",
+    "numpy>=2.2.6",
+]
+
+[project.optional-dependencies]
+dev = [
+    # 开发依赖
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+    "black>=25.9.0",
+    "ruff>=0.14.0",
+    "mypy>=1.18.2",
+    # FastAPI 测试
+    "httpx>=0.28.1",
+    "pytest-asyncio>=1.2.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatchling.build.targets.wheel]
+packages = ["src/laser_bird_server"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+    "black>=25.9.0",
+    "ruff>=0.14.0",
+    "mypy>=1.18.2",
+    "httpx>=0.28.1",
+    "pytest-asyncio>=1.2.0",
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+# 只格式化 src 和 test 目录
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # 默认排除的目录
+  \.eggs
+  | \.git
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+# 指定要检查的目录
+src = ["src", "test"]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+]
+ignore = [
+    "E501", # line too long, handled by black
+]
+
+[tool.ruff.isort]
+known-first-party = ["laser_bird_server"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+# 指定要检查的目录
+files = ["src", "test"]
+# 指定模块搜索路径
+mypy_path = "src"
+namespace_packages = true
+
+[tool.pytest.ini_options]
+# 测试目录路径
+testpaths = ["test"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+# 添加 src 到 Python 路径
+pythonpath = ["src"]
+# 覆盖率配置：只统计 src 目录
+addopts = "-v"
+
+[tool.coverage.run]
+# 覆盖率运行配置
+source = ["src"]
+omit = [
+    "*/test/*",
+    "*/__pycache__/*",
+    "*/.venv/*",
+]
+
+[tool.coverage.report]
+# 覆盖率报告配置
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
